@@ -47,8 +47,8 @@
     /* 按钮通用样式 */
     .btn {
       display: block;
-      width: calc(100% - 32px); /* 左右留白 */
-      max-width: 320px;         /* 防止在 iPad 上过宽 */
+      width: calc(100% - 32px);
+      max-width: 320px;
       height: 54px;
       margin: 0 auto 12px;
       padding: 0;
@@ -71,7 +71,6 @@
       background: #0062cc;
     }
 
-    /* 文件名提示 */
     .file-name {
       min-height: 20px;
       font-size: 15px;
@@ -80,7 +79,6 @@
       padding: 0 16px;
     }
 
-    /* 结果区域 */
     .result {
       background: white;
       padding: 22px;
@@ -123,7 +121,6 @@
       display: none;
     }
 
-    /* 隐藏原生 file input */
     #fileInput {
       display: none;
     }
@@ -131,21 +128,21 @@
 </head>
 <body>
   <div class="container">
-    <h1>📅 加班时长计算器</h1>
+    <h1>加班时长计算器</h1>
     <p class="description">选择你的 <code>overtime_log.json</code> 文件<br>（支持从 iCloud 或本地上传）</p>
 
     <button class="btn" onclick="document.getElementById('fileInput').click()">
-      📁 选择 JSON 文件
+      选择 JSON 文件
     </button>
     <div class="file-name" id="fileName">未选择文件</div>
-    <button class="btn" onclick="processFile()">✅ 计算加班</button>
+    <button class="btn" onclick="processFile()">计算加班</button>
 
     <input type="file" id="fileInput" accept=".json" onchange="showFileName()" />
 
     <div id="result"></div>
 
     <div id="installPrompt">
-      💡 提示：点击 Safari 分享按钮 → “添加到主屏幕”，<br>以后像 App 一样快速使用！
+      提示：点击 Safari 分享按钮 → “添加到主屏幕”，<br>以后可像 App 一样快速使用。
     </div>
   </div>
 
@@ -154,7 +151,7 @@
       const input = document.getElementById('fileInput');
       const el = document.getElementById('fileName');
       if (input.files.length > 0) {
-        el.textContent = '✅ 已选择：' + input.files[0].name;
+        el.textContent = '已选择：' + input.files[0].name;
         el.style.color = '#007AFF';
       } else {
         el.textContent = '未选择文件';
@@ -162,7 +159,6 @@
       }
     }
 
-    // Safari 提示
     if (/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) {
       document.getElementById('installPrompt').style.display = 'block';
     }
@@ -240,7 +236,7 @@
 
       } catch (err) {
         document.getElementById('result').innerHTML =
-          `<div class="result" style="color:#ff3b30;">❌ 解析失败：${err.message}</div>`;
+          `<div class="result" style="color:#ff3b30;">解析失败：${err.message}</div>`;
       }
     }
   </script>
