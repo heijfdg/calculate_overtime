@@ -9,23 +9,9 @@
   <link rel="icon" type="image/png" sizes="180x180" href="./icon.png">
   
   <!-- iOS 主屏幕图标（可选，提升 PWA 感） -->
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png">
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./icon.png">
 
   <style>
-    /* 1. 启动瞬间就让整个视口变成图标主色，避免白闪 */
-    html {
-      background: #007AFF;   /* 跟 icon.png 主色一致 */
-    }
-    
-    /* 2. 真正内容区渲染后再盖回原来的浅灰 */
-    body {
-      background: #f5f5f7;
-      min-height: 100vh;     /* 保证 body 撑满，防止底部留蓝边 */
-    }
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
       margin: 0;
