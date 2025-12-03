@@ -1,4 +1,182 @@
-async function processFile() {
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>加班统计工具</title>
+
+  <!-- 极简 SVG Favicon - 内联 -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23007AFF' fill-opacity='0.1' stroke='%23007AFF' stroke-width='6'/><path d='M50 30 v20 l15 15' stroke='%23007AFF' stroke-width='6' fill='none' stroke-linecap='round'/></svg>">
+
+  <!-- iOS 主屏幕图标（可选，提升 PWA 感） -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ffffff'/><circle cx='50' cy='50' r='40' fill='none' stroke='%23007AFF' stroke-width='8'/><path d='M50 35 v20 l18 18' stroke='%23007AFF' stroke-width='8' fill='none' stroke-linecap='round'/></svg>">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 24px 16px;
+      background: #f5f5f7;
+      color: #1d1d1f;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin: 0 0 16px;
+      font-weight: 600;
+    }
+
+    .description {
+      font-size: 16px;
+      color: #6e6e73;
+      margin-bottom: 28px;
+      padding: 0 10px;
+    }
+
+    code {
+      background: #e9e9eb;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 15px;
+    }
+
+    .btn {
+      display: block;
+      width: calc(100% - 32px);
+      max-width: 320px;
+      height: 54px;
+      margin: 0 auto 12px;
+      padding: 0;
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 54px;
+      border: none;
+      border-radius: 14px;
+      background: #007AFF;
+      color: white;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.2s;
+    }
+
+    .btn:active {
+      background: #0062cc;
+    }
+
+    .file-name {
+      min-height: 20px;
+      font-size: 15px;
+      color: #007AFF;
+      margin: 0 0 20px;
+      padding: 0 16px;
+    }
+
+    .result {
+      background: white;
+      padding: 22px;
+      border-radius: 18px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+      font-size: 16px;
+      text-align: left;
+      margin-top: 10px;
+    }
+
+    .result h2 {
+      font-size: 20px;
+      margin: 0 0 16px;
+      color: #007AFF;
+    }
+
+    .result p {
+      margin: 12px 0;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #eee;
+      margin: 16px 0;
+    }
+
+    .total {
+      font-weight: bold;
+      font-size: 18px;
+      color: #ff3b30;
+      display: block;
+      margin-top: 16px;
+    }
+
+    #installPrompt {
+      font-size: 14px;
+      color: #8e8e93;
+      margin-top: 28px;
+      padding: 0 16px;
+      display: none;
+    }
+
+    #fileInput {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>加班时长计算器</h1>
+    <p class="description">选择你的 <code>overtime_log.json</code> 文件<br>（支持从 iCloud 或本地上传）</p>
+
+    <button class="btn" onclick="document.getElementById('fileInput').click()">
+      选择 JSON 文件
+    </button>
+    <div class="file-name" id="fileName">未选择文件</div>
+    <button class="btn" onclick="processFile()">计算加班</button>
+
+    <input type="file" id="fileInput" accept=".json" onchange="showFileName()" />
+
+    <div id="result"></div>
+
+    <div id="installPrompt">
+      提示：点击 Safari 分享按钮 → “添加到主屏幕”，<br>以后可像 App 一样快速使用。
+    </div>
+  </div>
+
+  <script>
+    function showFileName() {
+      const input = document.getElementById('fileInput');
+      const el = document.getElementById('fileName');
+      if (input.files.length > 0) {
+        el.textContent = '已选择：' + input.files[0].name;
+        el.style.color = '#007AFF';
+      } else {
+        el.textContent = '未选择文件';
+        el.style.color = '#999';
+      }
+    }
+
+    if (/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) {
+      document.getElementById('installPrompt').style.display = 'block';
+    }
+
+    function formatDuration(seconds) {
+      if (seconds <= 0) return "0小时0分钟";
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      return `${h}小时${m}分钟`;
+    }
+
+    async function processFile() {
   const file = document.getElementById('fileInput').files[0];
   if (!file) {
     alert("请先选择一个 JSON 文件");
@@ -71,3 +249,6 @@ async function processFile() {
       `<div class="result" style="color:#ff3b30;">解析失败：${err.message}</div>`;
   }
 }
+    </script>
+</body>
+</html>
