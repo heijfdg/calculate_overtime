@@ -1,23 +1,219 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>加班统计工具</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-    .result { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; }
-    textarea { width: 100%; height: 150px; margin: 10px 0; }
+    /* 禁用 iOS 按钮默认样式 */
+    input[type="file"]::-webkit-file-upload-button,
+    button {
+      font-size: 18px;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      background: #007AFF;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px 0;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #f5f5f7;
+      color: #1d1d1f;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1d1d1f;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      text-align: center;
+      color: #6e6e73;
+    }
+
+    code {
+      background: #e9e9eb;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 15px;
+    }
+
+    .result {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      margin-top: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .result h2 {
+      font-size: 20px;
+      margin-top: 0;
+      color: #007AFF;
+    }
+
+    .result p {
+      margin: 12px 0;
+      text-align: left;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #e9e9eb;
+      margin: 16px 0;
+    }
+
+    .total {
+      font-weight: bold;
+      font-size: 18px;
+      color: #ff3b30;
+      margin-top: 16px;
+      display: block;
+    }
+
+    /* 添加到主屏幕提示（仅 Safari 显示） */
+    #installPrompt {
+      text-align: center;
+      font-size: 14px;
+      color: #8e8e93;
+      margin-top: 20px;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <h1>📅 加班时长计算器</h1>
-  <p>选择你的 <code>overtime_log.json</code> 文件（从 iCloud 或本地）：</p>
-  
-  <input type="file" id="fileInput" accept=".json" />
-  <button onclick="processFile()">计算加班</button>
+  <div class="container">
+    <h1>📅 加班时长计算器</h1>
+    <p>选择你的 <code>overtime_log.json</code> 文件<br>（支持从 iCloud 或本地上传）</p>
 
-  <div id="result"></div>
+    <input type="file" id="fileInput" accept=".json" />
+    <button onclick="processFile()">计算加班</button>
 
-  <script src="app.js"></script>
+    <div id="result"></div>
+
+    <div id="installPrompt">
+      💡 提示：点击 Safari 分享按钮 → “添加到主屏幕”，<br>以后像 App 一样快速使用！
+    </div>
+  </div>
+
+  <script>
+    // 检测是否为 Safari 并提示“添加到主屏幕”
+    if (/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) {
+      document.getElementById('installPrompt').style.display = 'block';
+    }
+
+    function formatDuration(seconds) {
+      if (seconds <= 0) return "0小时0分钟";
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return `${hours}小时${minutes}分钟`;
+    }
+
+    async function processFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("请先选择一个 JSON 文件");
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+
+        const weekdayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+        let totalSeconds = 0;
+        const details = [];
+
+        for (const [dateStr, value] of Object.entries(data)) {
+          if (!value?.entries) continue;
+
+          const entries = Array.isArray(value.entries) ? value.entries : [value.entries];
+          const datetimes = entries.map(ts => new Date(ts)).sort((a, b) => a - b);
+          const recordDate = new Date(dateStr);
+
+          const year = recordDate.getFullYear();
+          const month = recordDate.getMonth() + 1;
+          if (year !== currentYear || month !== currentMonth) continue;
+
+          const weekdayIndex = recordDate.getDay();
+          const isWeekend = weekdayIndex === 0 || weekdayIndex === 6;
+          const timesStr = datetimes.map(d => d.toTimeString().slice(0, 5)).join(", ");
+
+          let overtimeSec = 0;
+          if (isWeekend) {
+            const start = datetimes[0];
+            const end = datetimes[datetimes.length - 1];
+            overtimeSec = (end - start) / 1000;
+          } else {
+            const workEndTime = new Date(recordDate);
+            workEndTime.setHours(17, 30, 0, 0);
+            const latest = datetimes[datetimes.length - 1];
+            if (latest > workEndTime) {
+              overtimeSec = (latest - workEndTime) / 1000;
+            }
+          }
+
+          if (overtimeSec > 0) totalSeconds += overtimeSec;
+
+          details.push({
+            date: dateStr,
+            weekday: weekdayNames[weekdayIndex],
+            times: timesStr,
+            durationStr: formatDuration(overtimeSec)
+          });
+        }
+
+        details.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        let html = `<h2>${currentYear}年${currentMonth}月 加班明细</h2>`;
+        if (details.length === 0) {
+          html += `<p>本月暂无加班记录。</p>`;
+        } else {
+          details.forEach(day => {
+            html += `
+              <p>
+                <strong>${day.date} (${day.weekday})</strong><br>
+                打卡时间: ${day.times}<br>
+                加班时长: ${day.durationStr}
+              </p>
+              <hr>
+            `;
+          });
+          html += `<span class="total">总加班时长: ${(totalSeconds / 3600).toFixed(2)} 小时</span>`;
+        }
+
+        document.getElementById('result').innerHTML = `<div class="result">${html}</div>`;
+
+      } catch (err) {
+        document.getElementById('result').innerHTML = 
+          `<div class="result" style="color:#ff3b30;">❌ 解析失败：${err.message}</div>`;
+      }
+    }
+  </script>
 </body>
 </html>
