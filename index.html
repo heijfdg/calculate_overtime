@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>加班统计工具</title>
 
-  <!-- 极简 SVG Favicon - 内联 -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23007AFF' fill-opacity='0.1' stroke='%23007AFF' stroke-width='6'/><path d='M50 30 v20 l15 15' stroke='%23007AFF' stroke-width='6' fill='none' stroke-linecap='round'/></svg>">
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23007AFF' fill-opacity='0.08' stroke='%23007AFF' stroke-width='6'/><path d='M50 30 v20 l15 15' stroke='%23007AFF' stroke-width='6' fill='none' stroke-linecap='round'/></svg>">
 
-  <!-- iOS 主屏幕图标（可选，提升 PWA 感） -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ffffff'/><circle cx='50' cy='50' r='40' fill='none' stroke='%23007AFF' stroke-width='8'/><path d='M50 35 v20 l18 18' stroke='%23007AFF' stroke-width='8' fill='none' stroke-linecap='round'/></svg>">
+  <!-- iOS 图标（占位，Safari PWA 会自动处理） -->
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAACiYx2/AAAABHNCSVQICAgIfAhkiAAABz5JREFUeJzt3b1uG0cYxuFf2cdLXxax3CX6iQC2NhbbX6I0X58F3RDeo63HgFUsVTNff7kwh28ykVfoCkb0N7LxyzKDn5i7P3cu6UOxuRsLZs48UUQQAABBBBAAAEEEEAAAQSzAjtAAZLxTveV4bkNvVKgf/mBlC9ZwTe74MkRUQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBPkPOsY1oWXcnZ6+QcmGeXgnz9K/Y/xFdVtOfvtTDHkJ/xZ4wNG0Ax7AnCM1jDDkwh28ykVfoCkb0N7LxyzKapzHaxDTXiiMHDL/95B2S/bRMyCV2wAPOQg8nH3UX0DpD+s/COM24ByTx5cDIe8JD7Bq+wg7n1HULICwhf66A1VpzwuWgxeqmoeZaZX6mE6xPD58x35H0TADaBrZEcD3gjKPaR4HIX66D+QP9en5ZaY1f+T5iAG2Dk8xmPKzW0fvk/sdzCYwHNBA8CPraXIefQun7qY5T2r8j04YfGLwRoPmbxq0E8xmPK/wEYBLETymcHk5wAAAABJRU5ErkJggg==">
 
   <style>
     * {
@@ -23,6 +23,7 @@
       background: #f5f5f7;
       color: #1d1d1f;
       line-height: 1.5;
+      transition: background 0.3s, color 0.3s;
     }
 
     .container {
@@ -44,20 +45,12 @@
       padding: 0 10px;
     }
 
-    code {
-      background: #e9e9eb;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 15px;
-    }
-
     .btn {
       display: block;
       width: calc(100% - 32px);
       max-width: 320px;
       height: 54px;
       margin: 0 auto 12px;
-      padding: 0;
       font-size: 18px;
       font-weight: 500;
       line-height: 54px;
@@ -66,13 +59,9 @@
       background: #007AFF;
       color: white;
       cursor: pointer;
-      -webkit-appearance: none;
       appearance: none;
-      text-align: center;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.2s;
+      transition: background 0.25s;
     }
-
     .btn:active {
       background: #0062cc;
     }
@@ -81,170 +70,172 @@
       min-height: 20px;
       font-size: 15px;
       color: #007AFF;
-      margin: 0 0 20px;
-      padding: 0 16px;
+      margin-bottom: 20px;
     }
 
     .result {
       background: white;
       padding: 22px;
       border-radius: 18px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
       font-size: 16px;
       text-align: left;
       margin-top: 10px;
-    }
-
-    .result h2 {
-      font-size: 20px;
-      margin: 0 0 16px;
-      color: #007AFF;
-    }
-
-    .result p {
-      margin: 12px 0;
+      transition: background 0.3s, box-shadow 0.3s;
     }
 
     hr {
       border: 0;
-      border-top: 1px solid #eee;
-      margin: 16px 0;
+      border-top: 1px solid #e0e0e0;
+      margin: 14px 0;
     }
 
     .total {
       font-weight: bold;
       font-size: 18px;
       color: #ff3b30;
-      display: block;
       margin-top: 16px;
+      display: block;
     }
 
     #installPrompt {
       font-size: 14px;
       color: #8e8e93;
       margin-top: 28px;
-      padding: 0 16px;
       display: none;
     }
 
-    #fileInput {
-      display: none;
+    #fileInput { display:none; }
+
+    /* 暗色模式 */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #1c1c1e;
+        color: #f5f5f7;
+      }
+      .description {
+        color: #9fa0a6;
+      }
+      .result {
+        background: #2c2c2e;
+        box-shadow: 0 3px 12px rgba(255,255,255,0.03);
+      }
+      hr {
+        border-top-color: #3a3a3c;
+      }
+      .total {
+        color: #ff453a;
+      }
     }
+
   </style>
 </head>
 <body>
   <div class="container">
     <h1>加班时长计算器</h1>
-    <p class="description">选择你的 <code>overtime_log.json</code> 文件<br>（支持从 iCloud 或本地上传）</p>
+    <p class="description">选择你的 <code>overtime_log.json</code> 文件</p>
 
-    <button class="btn" onclick="document.getElementById('fileInput').click()">
-      选择 JSON 文件
-    </button>
+    <button class="btn" onclick="document.getElementById('fileInput').click()">选择 JSON 文件</button>
     <div class="file-name" id="fileName">未选择文件</div>
     <button class="btn" onclick="processFile()">计算加班</button>
 
     <input type="file" id="fileInput" accept=".json" onchange="showFileName()" />
-
     <div id="result"></div>
 
     <div id="installPrompt">
-      提示：点击 Safari 分享按钮 → “添加到主屏幕”，<br>以后可像 App 一样快速使用。
+      提示：点击 Safari 分享按钮 → “添加到主屏幕”
     </div>
   </div>
 
-  <script>
-    function showFileName() {
-      const input = document.getElementById('fileInput');
-      const el = document.getElementById('fileName');
-      if (input.files.length > 0) {
-        el.textContent = '已选择：' + input.files[0].name;
-        el.style.color = '#007AFF';
-      } else {
-        el.textContent = '未选择文件';
-        el.style.color = '#999';
+<script>
+function showFileName() {
+  const input = document.getElementById('fileInput');
+  document.getElementById('fileName').textContent =
+    input.files.length ? ('已选择：' + input.files[0].name) : '未选择文件';
+}
+
+if (/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) {
+  document.getElementById('installPrompt').style.display = 'block';
+}
+
+function formatDuration(seconds) {
+  if (seconds <= 0) return "0小时0分钟";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return `${h}小时${m}分钟`;
+}
+
+async function processFile() {
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) { alert("请先选择文件"); return; }
+
+  try {
+    const data = JSON.parse(await file.text());
+
+    const now = new Date();
+    const Y = now.getFullYear();
+    const M = now.getMonth() + 1;
+    const weekdayNames = ["周日","周一","周二","周三","周四","周五","周六"];
+
+    const details = [];
+    let totalSec = 0;
+
+    // 本月天数
+    const days = new Date(Y, M, 0).getDate();
+
+    for (let d = 1; d <= days; d++) {
+      const date = new Date(Y, M - 1, d);
+      const dateStr = date.toISOString().slice(0,10);
+      const weekday = weekdayNames[date.getDay()];
+      const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+      const info = data[dateStr];
+      let datetimes = [];
+
+      if (info?.entries) {
+        const entries = Array.isArray(info.entries) ? info.entries : [info.entries];
+        datetimes = entries.map(ts => new Date(ts)).sort((a,b)=>a-b);
       }
-    }
 
-    if (/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) {
-      document.getElementById('installPrompt').style.display = 'block';
-    }
+      let overtimeSec = 0;
 
-    function formatDuration(seconds) {
-      if (seconds <= 0) return "0小时0分钟";
-      const h = Math.floor(seconds / 3600);
-      const m = Math.floor((seconds % 3600) / 60);
-      return `${h}小时${m}分钟`;
-    }
-
-    async function processFile() {
-      const file = document.getElementById('fileInput').files[0];
-      if (!file) {
-        alert("请先选择一个 JSON 文件");
-        return;
+      if (isWeekend && datetimes.length >= 2) {
+        overtimeSec = (datetimes.at(-1) - datetimes[0]) / 1000;
+      } else if (!isWeekend && datetimes.length >= 1) {
+        const end = new Date(date);
+        end.setHours(17,30,0,0);
+        const latest = datetimes.at(-1);
+        if (latest > end) overtimeSec = (latest - end) / 1000;
       }
 
-      try {
-        const data = JSON.parse(await file.text());
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;
-        const weekdayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-        let totalSec = 0;
-        const details = [];
+      if (overtimeSec > 0) totalSec += overtimeSec;
 
-        for (const [dateStr, value] of Object.entries(data)) {
-          if (!value?.entries) continue;
-          const entries = Array.isArray(value.entries) ? value.entries : [value.entries];
-          const datetimes = entries.map(ts => new Date(ts)).sort((a, b) => a - b);
-          const d = new Date(dateStr);
-          if (d.getFullYear() !== currentYear || d.getMonth() + 1 !== currentMonth) continue;
-
-          const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-          let overtimeSec = 0;
-
-          if (isWeekend && datetimes.length >= 2) {
-            overtimeSec = (datetimes[datetimes.length - 1] - datetimes[0]) / 1000;
-          } else if (!isWeekend) {
-            const workEnd = new Date(d);
-            workEnd.setHours(17, 30, 0, 0);
-            const latest = datetimes[datetimes.length - 1];
-            if (latest > workEnd) overtimeSec = (latest - workEnd) / 1000;
-          }
-
-          if (overtimeSec > 0) {
-            totalSec += overtimeSec;
-            details.push({
-              date: dateStr,
-              weekday: weekdayNames[d.getDay()],
-              times: datetimes.map(t => t.toTimeString().slice(0, 5)).join(", "),
-              durationStr: formatDuration(overtimeSec)
-            });
-          }
-        }
-
-        details.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        let html = `<h2>${currentYear}年${currentMonth}月 加班明细</h2>`;
-        if (details.length === 0) {
-          html += `<p>本月暂无加班记录。</p>`;
-        } else {
-          for (const day of details) {
-            html += `
-              <p><strong>${day.date} (${day.weekday})</strong><br>
-                 打卡时间: ${day.times}<br>
-                 加班时长: ${day.durationStr}</p>
-              <hr>`;
-          }
-          html += `<span class="total">总加班时长: ${(totalSec / 3600).toFixed(2)} 小时</span>`;
-        }
-
-        document.getElementById('result').innerHTML = `<div class="result">${html}</div>`;
-
-      } catch (err) {
-        document.getElementById('result').innerHTML =
-          `<div class="result" style="color:#ff3b30;">解析失败：${err.message}</div>`;
-      }
+      details.push({
+        date: dateStr,
+        weekday,
+        times: datetimes.length ? datetimes.map(t=>t.toTimeString().slice(0,5)).join(", ") : "无打卡",
+        duration: formatDuration(overtimeSec)
+      });
     }
-  </script>
+
+    let html = `<h2>${Y}年${M}月 加班明细</h2>`;
+
+    for (const x of details) {
+      html += `
+        <p><strong>${x.date} (${x.weekday})</strong><br>
+           打卡时间: ${x.times}<br>
+           加班时长: ${x.duration}</p>
+        <hr>`;
+    }
+
+    html += `<span class="total">总加班时长：${(totalSec/3600).toFixed(2)} 小时</span>`;
+    document.getElementById('result').innerHTML = `<div class="result">${html}</div>`;
+
+  } catch (err) {
+    document.getElementById('result').innerHTML =
+      `<div class="result" style="color:#ff3b30;">解析失败：${err.message}</div>`;
+  }
+}
+</script>
 </body>
 </html>
