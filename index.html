@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>加班统计工具</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+    .result { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; }
+    textarea { width: 100%; height: 150px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>📅 加班时长计算器</h1>
+  <p>选择你的 <code>overtime_log.json</code> 文件（从 iCloud 或本地）：</p>
+  
+  <input type="file" id="fileInput" accept=".json" />
+  <button onclick="processFile()">计算加班</button>
+
+  <div id="result"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
